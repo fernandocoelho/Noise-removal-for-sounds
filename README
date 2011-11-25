@@ -1,0 +1,101 @@
+FERNANDO CARDOSO COELHO                         GRR20082084
+JONATAS TEIXEIRA                                GRR20082754
+LUAN HADDAD RICARDO DOS SANTOS                  GRR20083152
+
+Relátorio em PDF com gráficos coloridos em ./doc
+
+Os testes consistem de 3 programas e 2 scripts.
+    interactive:
+        programa em c (openmp) para testar os filtros um a um,
+        escrevendo o resultado num novo arquivo de som.
+
+    omp:
+        programa em c (openmp) para testar todos os filtros gerando
+        uma saída YAML para plotagem de gráficos.
+
+    cuda:
+        programa em c (cuda) para testar filtros um a um gerando uma
+        saída YAML para plotagem de gráficos.
+
+    pwave:
+        programa em c para ler um arquivo wave e gerar uma saída que
+        será lida pelo script pwave.py.
+
+    pwave.py:
+        script em python para ler a saida do pwave e plotar a onda
+        sonora.
+
+    plot.py:
+        script em python para plotar os resultados YAML gerados por
+        omp e cuda.
+
+Como compilar e usar:
+    interactive:
+            $ make interactive
+            $ ./bin/wave_interactive
+
+        selecionar opções do menu e pronto
+
+    omp:
+            $ make omp
+            $ ./bin/wave_omp arq.wav 4 8 Dalmore > data.yml
+        ou 
+            $ ./bin/wave_omp <filename> <num_procs> <num_tests> <machine_name>
+
+        gerará um arquivo data.yml que pode ser lido como texto ou
+        pelo script plot.py
+
+    cuda:
+            $ make cuda
+            $ ./bin/wave_cuda arq.wav > cuda.yml
+
+        gerará uma saída yml, que precisa ser tratada manualmente
+        antes de plotar
+        já que os filtros devem ser executados um a um
+        para alterar os filtos, necessário editar arquivo 'main.cu'
+        linha 55-58 e comentar/descomentar as linhas dos filtros,
+        deixando apenas o desejado dos arquivos gerados de todos os
+        filtros unir em um único no formato:
+
+            Cuda:
+                <filtro>:
+                    <iteração>: <valor>
+                    <iteração>: <valor>
+                    ...
+                <filtro>:
+                    <iteração>: <valor>
+                    <iteração>: <valor>
+                    ...
+                ...
+
+    pwave e pwave.py:
+        necessário executar os 2 em conjunto para ter sentido
+        !! necessário biblioteca MATPLOTLIB do python !!
+
+            $ make pwave
+            $ ./bin/pwave arq.wave | python scritps/pwave.py
+        
+        abrirá um gráfico mostrando a onda
+
+    plot.py:
+        necessário colocar um arquivo 'data.yml' (exatamente este
+        nome) na pasta ./scripts no formato
+
+            <Máquina>:
+                <filtro>:
+                    <iteração>: <valor>
+                    ...
+                ...
+            ...
+
+        quantas máquinas quiser, a iteração deve ser um inteiro e o
+        valor um número real qualquer para geração dos gráficos é
+        necessário que no arquivo data.yml haja uma máquina
+        principal, que infelizmente está 'hardcoded' no plot.py como
+        sendo 'Prd3c', para alterar isso, basta editar a linha 51 do
+        plot.py e colocar qualquer outra máquina.
+
+            $ cd scripts
+            $ python plot.py
+            $ display filters.png
+
